@@ -167,7 +167,7 @@ public class AppUpdateController {
         }
 
         //设置文件的下载名
-        String name = (String) jsonObject.get("name");
+        String name = jsonObject.getString("name");
         //传输文件
         transferFile(response, name, filePath, size);
     }
@@ -200,11 +200,11 @@ public class AppUpdateController {
 
         //当有多个文件时
         for (int i = 0; i < files.size(); i++) {
-            if ("true".equals(files.getJSONObject(i).get("isMain"))) {
+            if (files.getJSONObject(i).getBoolean("isMain")) {
                 //获取JSON对象
                 JSONObject jsonObject = files.getJSONObject(i);
                 //返回文件下载地址
-                return jsonObject.get("file").toString();
+                return jsonObject.getString("file");
             }
         }
 
