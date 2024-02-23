@@ -1,0 +1,30 @@
+
+
+
+spring:
+  datasource: #配置数据库连接的信息
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql:///app_manage
+  servlet: #配置上传问题
+    multipart:
+      enabled: true #开启上传
+      max-file-size: 300MB #单个上传文件的大小限制
+      max-request-size: 300MB #设置总体文件大小请求
+
+server:
+  port: 9090 #配置项目的端口号
+  servlet:
+    context-path: /meeting #配置项目的访问路径
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #控制台输出sql语句
+    auto-mapping-behavior: full #开启多层映射
+  mapper-locations: classpath:/mappers/*.xml
+
+file:
+  uploadFolder: D:\User\Documents\Files\
+
