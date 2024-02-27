@@ -112,14 +112,14 @@ public class UserController {
 
         //拼接模糊查询的条件
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        if (!StringUtils.isEmpty(req.getParameter("id"))) {
-            queryWrapper.eq( "id", req.getParameter("id") );
-        }
-        if (!StringUtils.isEmpty(req.getParameter("name"))) {
-            queryWrapper.like( "name", req.getParameter("name") );
-        }
         if (!StringUtils.isEmpty(req.getParameter("username"))) {
-            queryWrapper.like( "username", req.getParameter("username") );
+            queryWrapper.eq( "username", req.getParameter("username") );
+        }
+        if (!StringUtils.isEmpty(req.getParameter("phone"))) {
+            queryWrapper.like( "phone", req.getParameter("phone") );
+        }
+        if (!StringUtils.isEmpty(req.getParameter("idNumber"))) {
+            queryWrapper.like( "id_Number", req.getParameter("idNumber") );
         }
 
         Page<User> pageData = userService.page(page, queryWrapper);

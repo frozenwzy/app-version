@@ -28,11 +28,16 @@ public class AppController {
 
 
     //增加操作
-    @PostMapping("addAndUpload")
+    @PostMapping("add")
     public Result<?> add(@RequestBody App app) {
 
         //使用日志记录器打印消息，表示开始添加app版本信息。
         log.info("开始添加app版本信息");
+
+//        //获取请求体中的数据
+//        Map<String, String> map = AppUpdateController.parameterToMap(request);
+//        //把JSON数据映射到实体类
+//        App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
 
         //判断添加的应用是否已存在
         if (isAppExist("name", app.getName())) {
@@ -163,6 +168,7 @@ public class AppController {
         //临时保存文件总大小
         long sum = 0;
 
+        //循环获取JSON数组中键为size的值
         for (int i = 0; i < jsonArray.size(); i++) {
             sum += jsonArray.getJSONObject(i).getLong("size");
         }

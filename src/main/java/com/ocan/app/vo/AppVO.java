@@ -19,8 +19,6 @@ public class AppVO extends App {
     private String md5;
     //文件类型
     private String type;
-    //下载后安装的目标位置
-    private String dist;
     //判断是否是主文件
     private String isMain;
     //app的名字
