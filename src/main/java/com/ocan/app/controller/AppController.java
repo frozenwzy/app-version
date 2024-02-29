@@ -34,10 +34,13 @@ public class AppController {
     @Autowired //警告说是不建议现在注入
     private AppService appService;
 
+    @Autowired
+    private AppUpdateController appUpdateController;
+
 
     //增加操作
     @PostMapping("add")
-    public Result<?> add(HttpServletRequest request, MultipartFile pictureFile) {
+    public Result<?> add(MultipartFile icon, HttpServletRequest request) {
 
         //使用日志记录器打印消息，表示开始添加app版本信息。
         log.info("开始添加app版本信息");
@@ -48,7 +51,7 @@ public class AppController {
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
         //把图片保存到磁盘上，获取图片的存储路径
-        app.setIcon(AppUpdateController.transformToPicture(pictureFile));
+        app.setIcon(appUpdateController.transformToPicture(icon));
 
 
         //判断添加的应用是否已存在
@@ -59,7 +62,9 @@ public class AppController {
         }
 
         //设置size值大小
-        app.setSize(totalSize(app.getFiles()));
+        if (null != app.getFiles()) {
+            app.setSize(totalSize(app.getFiles()));
+        }
 
         boolean whetherSuccess = appService.save(app);
         if (whetherSuccess) {
@@ -110,7 +115,9 @@ public class AppController {
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
 
         //设置size值大小
-        app.setSize(totalSize(app.getFiles()));
+        if (null != app.getFiles()) {
+            app.setSize(totalSize(app.getFiles()));
+        }
 
         boolean whetherSuccess = appService.updateById(app);
         if (whetherSuccess) {
@@ -161,8 +168,10 @@ public class AppController {
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
 
-        //设置size值
-        app.setSize(totalSize(app.getFiles()));
+        //设置size值大小
+        if (null != app.getFiles()) {
+            app.setSize(totalSize(app.getFiles()));
+        }
 
         //生成信息的记录
         boolean whetherSuccess = appService.save(app);

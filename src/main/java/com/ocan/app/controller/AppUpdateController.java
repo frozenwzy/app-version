@@ -37,7 +37,7 @@ public class AppUpdateController {
 
     //获取文件的存储根路径
     @Value("${file.uploadFolder}")
-    private static String rootPath;
+    private  String rootPath;
 
     //临时存放文件的MD5
     private Set<String> md5List = new HashSet<>();
@@ -68,22 +68,6 @@ public class AppUpdateController {
         }
 
 
-    }
-
-
-    //图片上传
-    @PostMapping("pictureUpload")
-    public Result<?> pictureUpload(MultipartFile file) {
-        //判断是否接收到文件
-        if (null == file) {
-            return Result.error("上传失败，图片为空！");
-        }
-
-        //获取文件的存储路径
-        String icon = transformToPicture(file);
-
-
-        return Result.OK("图片上传成功！", icon);
     }
 
 
@@ -177,6 +161,7 @@ public class AppUpdateController {
     //下载所有文件
     @GetMapping("downloadAll")
     public void downloadAll(@RequestParam Long id, HttpServletResponse response) {
+
         //记录下载的app的id和下载时间
         log.info("time = {},开始下载app,appId = {}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), id);
         //获取指定id的app对象
@@ -308,7 +293,7 @@ public class AppUpdateController {
     }
 
     //初始化文件信息，把图片保存在磁盘上，并返回路径
-    public static String transformToPicture(MultipartFile file) {
+    public String transformToPicture(MultipartFile file) {
 
         //图片的完整存储路径
         String fileFullPath = rootPath + "picture" + File.separator + file.getOriginalFilename();
