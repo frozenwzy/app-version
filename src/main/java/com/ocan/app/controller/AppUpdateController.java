@@ -1,5 +1,6 @@
 package com.ocan.app.controller;
 
+import cn.hutool.core.util.ZipUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -36,28 +37,10 @@ public class AppUpdateController {
 
     //获取文件的存储根路径
     @Value("${file.uploadFolder}")
-    private String rootPath;
+    private static String rootPath;
 
     //临时存放文件的MD5
     private Set<String> md5List = new HashSet<>();
-
-
-    //上传文件
-//    @PostMapping(value = "/upload")
-//    public Result<JSONArray> upload(MultipartFile[] files, @RequestBody AppVO appVO) {
-//
-//        try {
-//            JSONArray jsonArray = convert(files, appVO);
-//            return Result.OK("上传成功", jsonArray);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//            return Result.error("文件上传失败，上传的文件中存在相同的文件！");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return Result.error(e.getMessage());
-//        }
-//    }
-
 
 
     //单文件上传
@@ -70,7 +53,8 @@ public class AppUpdateController {
         }
 
         //获取请求体中的参数
-        Map<String, String> map = parameterToMap(request);
+        Map<String, Object> map = parameterToMap(request);
+
         //把JSON数据映射到java实体类
         AppVO appVO = JSONObject.parseObject(JSONObject.toJSONString(map), AppVO.class);
 
@@ -87,9 +71,26 @@ public class AppUpdateController {
     }
 
 
+    //图片上传
+    @PostMapping("pictureUpload")
+    public Result<?> pictureUpload(MultipartFile file) {
+        //判断是否接收到文件
+        if (null == file) {
+            return Result.error("上传失败，图片为空！");
+        }
+
+        //获取文件的存储路径
+        String icon = transformToPicture(file);
+
+
+        return Result.OK("图片上传成功！", icon);
+    }
+
+
     //检查新版本
     @GetMapping("checkNewVersion")
     public Result<?> checkNewVersion(@RequestParam String appCode, @RequestParam String platform, @RequestParam String appOwner) {
+
         //拼接所需的SQL语句
         QueryWrapper<App> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("app_Code", appCode).eq("platform", platform).
@@ -173,6 +174,46 @@ public class AppUpdateController {
     }
 
 
+    //下载所有文件
+    @GetMapping("downloadAll")
+    public void downloadAll(@RequestParam Long id, HttpServletResponse response) {
+        //记录下载的app的id和下载时间
+        log.info("time = {},开始下载app,appId = {}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), id);
+        //获取指定id的app对象
+        App app = appService.getById(id);
+        JSONArray jsonArray = app.getFiles();
+        JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+        //文件的下载路径
+        String filePath = jsonObject.getString("file");
+        //设置下载的文件名
+        String name = jsonObject.getString("name");
+        //文件的大小
+        Long size = app.getSize();
+
+
+        //如果是多个文件
+        if (app.getFiles().size() != 1) {
+            //获取文件的存放位置
+            File file = new File(filePath);
+            String parentFile = file.getParent();
+            //压缩文件，该工具类可能会被攻击
+            ZipUtil.zip(parentFile);
+            //对应磁盘上的压缩文件
+            File zipFile = new File(parentFile + ".zip");
+            size = zipFile.length();
+            name = zipFile.getName();
+            filePath = zipFile.getAbsolutePath();
+
+        }
+
+        //传输文件
+        transferFile(response, name, filePath, size);
+
+
+    }
+
+
     //传输单一文件
     private void transferFile(HttpServletResponse response, String name, String filePath, long size) {
         //传输文件
@@ -211,65 +252,7 @@ public class AppUpdateController {
         return "该App没有主文件！";
     }
 
-
-    //初始化文件信息，把MultipartFile对象转为JSONArray对象，并保存在磁盘上
-    private JSONArray convert(MultipartFile[] files, List<AppVO> appVOList) throws IOException {
-
-        //获取当前年月
-        String format = new SimpleDateFormat("yyyy-MM").format(new Date());
-        JSONArray jsonArray = new JSONArray();
-
-        //获取每个appVO对象
-        for (AppVO appVO : appVOList) {
-            //获取每个文件
-            for (MultipartFile file : files) {
-                //创建用于保存文件信息的JSON对象
-                JSONObject jsonFile = new JSONObject();
-
-                //获取文件的MD5值
-                String md5 = null;
-                try {
-                    md5 = MD5.bufferMD5(file.getBytes());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                //创建文件对象
-                File saveFile = new File(rootPath + format + File.separator
-                        + appVO.getAppName() + File.separator + appVO.getName());
-                //判断磁盘上是否存在对应的位置，如果不存在，则创建
-                if (!saveFile.exists()) {
-                    saveFile.mkdirs();
-                }
-                //拷贝文件
-                FileCopyUtils.copy(file.getBytes(), saveFile);
-
-                //设置文件的磁盘路径
-                jsonFile.put("file", saveFile);
-                //设置文件名
-                jsonFile.put("name", appVO.getName());
-                //设置文件大小
-                jsonFile.put("size", file.getSize());
-                //设置文件的MD5值
-                jsonFile.put("md5", md5);
-                //设置文件的类型
-                jsonFile.put("type", file.getContentType());
-                //设置是否是主文件
-                jsonFile.put("isMain", appVO.getIsMain());
-
-                //把JSON对象添加到JSON数组中
-                jsonArray.add(jsonFile);
-            }
-        }
-
-
-
-        return jsonArray;
-
-    }
-
-
-    //初始化文件信息，把MultipartFile对象转为JSON对象，并保存在磁盘上
+    //初始化文件信息，把文件对象转为JSON对象，并保存在磁盘上
     private JSONObject transformToJSON(MultipartFile file, AppVO appVO) throws IOException {
 
         //获取当前年月
@@ -324,21 +307,52 @@ public class AppUpdateController {
         return jsonFile;
     }
 
+    //初始化文件信息，把图片保存在磁盘上，并返回路径
+    public static String transformToPicture(MultipartFile file) {
+
+        //图片的完整存储路径
+        String fileFullPath = rootPath + "picture" + File.separator + file.getOriginalFilename();
+        //创建文件对象
+        File saveFile = new File(fileFullPath);
+        //判断磁盘上是否存在对应的位置，如果不存在，则创建
+        if (!saveFile.getParentFile().exists()) {
+            saveFile.getParentFile().mkdirs();
+        }
+
+        //拷贝文件
+        try {
+            FileCopyUtils.copy(file.getBytes(), saveFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return fileFullPath;
+    }
 
     //把前端表单参数转化为键值对存到map中
-    public static Map<String, String> parameterToMap(HttpServletRequest request) {
+    public static Map<String, Object> parameterToMap(HttpServletRequest request) {
 
         //从请求体中获取所有键值对数据
         Map<String, String[]> parameterMap = request.getParameterMap();
         log.info("parameterMap:{}", parameterMap);
 
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>();
+        JSONArray jsonArray = new JSONArray();
 
         //遍历parameterMap集合，把v[0]赋值给map集合
         parameterMap.forEach((k, v) -> {
-            map.put(k, v[0]);
+            //找出发送的JSON字符串
+            if (k.equals("files[]")) {
+                //把JSON字符串转为JSON对象
+                String[] strings = parameterMap.get("files[]");
+                for (String string : strings) {
+                    jsonArray.add(JSONObject.parseObject(string));
+                }
+                map.put("files", jsonArray);
+            } else {
+                map.put(k, v[0]);
+            }
         });
-        log.info("map:{}", map);
 
         return map;
     }
