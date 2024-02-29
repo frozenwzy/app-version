@@ -224,11 +224,19 @@ public class AppController {
     private List<App> modifyFiles(IPage<App> appIPage) {
 
         List<App> records = appIPage.getRecords();
-        Set<byte[]> set = new HashSet<>();
 
         for (App app : records) {
-            //给app的fileSet赋值
+            //获取图片的路径
+            String picturePath = app.getIcon();
+
+            //给app的属性赋值
+            try {
+                app.setPictureSet(FileUtils.readFileToByteArray(new File(picturePath)));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             app.setFileSet(getFileData(app));
+
         }
 
         return records;
@@ -238,7 +246,7 @@ public class AppController {
     //返回App的fileSet属性的值
     private Set<byte[]> getFileData(App app) {
 
-        Set<byte[]> set = new HashSet<>();
+        Set<byte[]> fileSet = new HashSet<>();
         //获取JSON数组
         JSONArray files = app.getFiles();
 
@@ -249,12 +257,12 @@ public class AppController {
             try {
                 //获取文件的字符格式
                 byte[] fileData = FileUtils.readFileToByteArray(new File(filePath));
-                set.add(fileData);
+                fileSet.add(fileData);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        return set;
+        return fileSet;
     }
 
 

@@ -123,6 +123,7 @@ public class SystemController {
 
     }
 
+
     //用户注册接口
     @PostMapping("register")
     public Result<?> addUser(@RequestBody User user) {

@@ -247,7 +247,7 @@ public class AppUpdateController {
 
 
         //获取文件的MD5值
-        String md5 = null;
+        String md5 = "";
         try {
             md5 = MD5.bufferMD5(file.getBytes());
         } catch (IOException e) {

@@ -52,4 +52,8 @@ public class App {
     @TableField(exist = false)
     private Set<byte[]> fileSet;
 
+    //存放图片
+    @TableField(exist = false)
+    private byte[] pictureSet;
+
 }
