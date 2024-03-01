@@ -40,7 +40,7 @@ public class AppController {
 
     //增加操作
     @PostMapping("add")
-    public Result<?> add(MultipartFile icon, HttpServletRequest request) {
+    public Result<?> add(MultipartFile icon, HttpServletRequest request) throws IOException {
 
         //使用日志记录器打印消息，表示开始添加app版本信息。
         log.info("开始添加app版本信息");
@@ -132,7 +132,7 @@ public class AppController {
     @GetMapping("list")
     public Result<?> list(@RequestParam(name = "current", defaultValue = "1") Integer pageNo,
                           @RequestParam(name = "size", defaultValue = "10") Integer pageSize,
-                          HttpServletRequest request) {
+                          HttpServletRequest request) throws IOException {
 
         if (pageNo < 0) {
             pageNo = 1;
@@ -190,6 +190,17 @@ public class AppController {
         return Result.OK(app.getFiles());
     }
 
+    //通过app的releaseTime获取到文件属性
+    @GetMapping("getByReleaseTime")
+    public Result<?> getByReleaseTime(@RequestParam String releaseTime) {
+        //拼接查询条件
+        QueryWrapper<App> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("release_time", releaseTime);
+
+        App app = appService.getOne(queryWrapper);
+        return Result.OK(app.getFiles());
+    }
+
 
     //判断数据库中是否已经存在要添加的数据
     private boolean isAppExist(String column, Object val) {
@@ -221,7 +232,7 @@ public class AppController {
 
 
     //修改查询返回的数据
-    private List<App> modifyFiles(IPage<App> appIPage) {
+    private List<App> modifyFiles(IPage<App> appIPage) throws IOException {
 
         List<App> records = appIPage.getRecords();
 
@@ -229,12 +240,9 @@ public class AppController {
             //获取图片的路径
             String picturePath = app.getIcon();
 
-            //给app的属性赋值
-            try {
-                app.setPictureSet(FileUtils.readFileToByteArray(new File(picturePath)));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
+            app.setPictureSet(FileUtils.readFileToByteArray(new File(picturePath)));
+
             app.setFileSet(getFileData(app));
 
         }
@@ -244,7 +252,7 @@ public class AppController {
 
 
     //返回App的fileSet属性的值
-    private Set<byte[]> getFileData(App app) {
+    private Set<byte[]> getFileData(App app) throws IOException {
 
         Set<byte[]> fileSet = new HashSet<>();
         //获取JSON数组
@@ -254,13 +262,11 @@ public class AppController {
         for (int i = 0; i < files.size(); i++) {
             //获取文件的路径
             String filePath = files.getJSONObject(i).getString("file");
-            try {
-                //获取文件的字符格式
-                byte[] fileData = FileUtils.readFileToByteArray(new File(filePath));
-                fileSet.add(fileData);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
+            //获取文件的字符格式
+            byte[] fileData = FileUtils.readFileToByteArray(new File(filePath));
+            fileSet.add(fileData);
+
         }
         return fileSet;
     }

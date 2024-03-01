@@ -54,6 +54,7 @@ public class UserController {
     //删除用户
     @GetMapping("delete")
     public Result<String> deleteUser(@RequestParam("id") Long id) {
+
         boolean whetherSuccess = userService.removeById(id);
         if (whetherSuccess) {
             return Result.OK("删除成功！");
@@ -67,6 +68,7 @@ public class UserController {
     //批量删除用户
     @GetMapping("deleteBatch")
     public Result<String> deleteBatch(@RequestParam("list") List<Long> list) {
+
         boolean whetherSuccess = userService.removeByIds(list);
         if (whetherSuccess) {
             return Result.OK("批量删除成功！");
@@ -125,7 +127,20 @@ public class UserController {
         Page<User> pageData = userService.page(page, queryWrapper);
 
         return Result.OK(pageData);
+
+
     }
+
+    //测试异常
+    @GetMapping("test")
+    public Result<?> test() {
+
+        String str = null;
+        str.toString();
+
+        return Result.ok("成功");
+    }
+
 
 
     //根据username来判断数据库中是否存在重复数据

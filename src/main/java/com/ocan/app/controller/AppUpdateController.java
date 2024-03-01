@@ -45,7 +45,7 @@ public class AppUpdateController {
 
     //单文件上传
     @PostMapping("upload")
-    public Result<?> upload(MultipartFile file, HttpServletRequest request) {
+    public Result<?> upload(MultipartFile file, HttpServletRequest request) throws IOException {
 
         //判断是否接收到文件
         if (null == file) {
@@ -58,14 +58,10 @@ public class AppUpdateController {
         //把JSON数据映射到java实体类
         AppVO appVO = JSONObject.parseObject(JSONObject.toJSONString(map), AppVO.class);
 
-        try {
-            JSONObject jsonObject = transformToJSON(file, appVO);
-            return Result.OK("上传成功", jsonObject);
-        } catch (FileExistsException e) {
-            return Result.error("上传失败，上传的文件中存在相同的文件！");
-        } catch (IOException e) {
-            return Result.error("上传失败，文件拷贝失败！");
-        }
+        //上传文件
+        JSONObject jsonObject = transformToJSON(file, appVO);
+
+        return Result.OK("上传成功！", jsonObject);
 
 
     }
@@ -100,7 +96,7 @@ public class AppUpdateController {
 
     //下载主文件
     @GetMapping("downloadMainVersionFile")
-    public void downloadMainVersionFile(@RequestParam Long id, @RequestParam String transformInfo, HttpServletResponse response) {
+    public void downloadMainVersionFile(@RequestParam Long id, @RequestParam String transformInfo, HttpServletResponse response) throws IOException {
         App app = appService.getById(id);
         JSONArray files = app.getFiles();
         //主文件的下载路径
@@ -130,7 +126,7 @@ public class AppUpdateController {
 
     //下载指定文件
     @GetMapping("downloadVersionFile")
-    public void downloadApp(@RequestParam Long id, @RequestParam String md5, HttpServletResponse response) {
+    public void downloadApp(@RequestParam Long id, @RequestParam String md5, HttpServletResponse response) throws IOException {
         App app = appService.getById(id);
         JSONArray files = app.getFiles();
         //指定文件的下载路径
@@ -160,7 +156,7 @@ public class AppUpdateController {
 
     //下载所有文件
     @GetMapping("downloadAll")
-    public void downloadAll(@RequestParam Long id, HttpServletResponse response) {
+    public void downloadAll(@RequestParam Long id, HttpServletResponse response) throws IOException {
 
         //记录下载的app的id和下载时间
         log.info("time = {},开始下载app,appId = {}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), id);
@@ -195,27 +191,22 @@ public class AppUpdateController {
         //传输文件
         transferFile(response, name, filePath, size);
 
-
     }
 
 
     //传输单一文件
-    private void transferFile(HttpServletResponse response, String name, String filePath, long size) {
+    private void transferFile(HttpServletResponse response, String name, String filePath, long size) throws IOException {
         //传输文件
-        try {
-            //设置文件名，文件类型
-            response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(name, "utf-8"));
-            response.setContentType("multipart/form-data"); //这样设置，会自动判断下载文件类型
 
-            //把磁盘中的文件读取到appFile数组中
-            byte[] appFile = FileUtils.readFileToByteArray(new File(filePath));
-            response.setContentLength((int) size);
-            StreamUtils.copy(appFile, response.getOutputStream());
+        //设置文件名，文件类型
+        response.setHeader("Content-disposition", "attachment; filename=" + URLEncoder.encode(name, "utf-8"));
+        response.setContentType("multipart/form-data"); //这样设置，会自动判断下载文件类型
 
+        //把磁盘中的文件读取到appFile数组中
+        byte[] appFile = FileUtils.readFileToByteArray(new File(filePath));
+        response.setContentLength((int) size);
+        StreamUtils.copy(appFile, response.getOutputStream());
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -245,14 +236,8 @@ public class AppUpdateController {
         //创建用于保存文件信息的JSON对象
         JSONObject jsonFile = new JSONObject();
 
-
         //获取文件的MD5值
-        String md5 = "";
-        try {
-            md5 = MD5.bufferMD5(file.getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String md5 = MD5.bufferMD5(file.getBytes());
 
         //把文件的MD5放到集合中
         boolean isSuccess = md5List.add(md5);
@@ -288,12 +273,11 @@ public class AppUpdateController {
         //设置是否是主文件
         jsonFile.put("isMain", appVO.getIsMain());
 
-
         return jsonFile;
     }
 
     //初始化文件信息，把图片保存在磁盘上，并返回路径
-    public String transformToPicture(MultipartFile file) {
+    public String transformToPicture(MultipartFile file) throws IOException {
 
         //图片的完整存储路径
         String fileFullPath = rootPath + "picture" + File.separator + file.getOriginalFilename();
@@ -305,11 +289,7 @@ public class AppUpdateController {
         }
 
         //拷贝文件
-        try {
-            FileCopyUtils.copy(file.getBytes(), saveFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        FileCopyUtils.copy(file.getBytes(), saveFile);
 
         return fileFullPath;
     }
