@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -62,7 +63,6 @@ public class AppUpdateController {
         JSONObject jsonObject = transformToJSON(file, appVO);
 
         return Result.OK("上传成功！", jsonObject);
-
 
     }
 
@@ -295,11 +295,16 @@ public class AppUpdateController {
     }
 
     //把前端表单参数转化为键值对存到map中
-    public static Map<String, Object> parameterToMap(HttpServletRequest request) {
+    public static Map<String, Object> parameterToMap(HttpServletRequest request) throws FileNotFoundException {
 
         //从请求体中获取所有键值对数据
         Map<String, String[]> parameterMap = request.getParameterMap();
-        log.info("parameterMap:{}", parameterMap);
+
+        //判断文件是否为空
+        String[] files = parameterMap.get("files");
+        if (null != files && files[0].equals("undefined")) {
+            throw new FileNotFoundException("添加失败！上传文件为空！");
+        }
 
         HashMap<String, Object> map = new HashMap<>();
         JSONArray jsonArray = new JSONArray();
@@ -308,6 +313,7 @@ public class AppUpdateController {
         parameterMap.forEach((k, v) -> {
             //找出发送的JSON字符串
             if (k.equals("files[]")) {
+
                 //把JSON字符串转为JSON对象
                 String[] strings = parameterMap.get("files[]");
                 for (String string : strings) {

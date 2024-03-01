@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -42,11 +43,17 @@ public class AppController {
     @PostMapping("add")
     public Result<?> add(MultipartFile icon, HttpServletRequest request) throws IOException {
 
+
         //使用日志记录器打印消息，表示开始添加app版本信息。
         log.info("开始添加app版本信息");
 
         //获取请求体中的数据
         Map<String, Object> map = AppUpdateController.parameterToMap(request);
+
+        //判断图片是否为空
+        if (null == icon) {
+            throw new FileNotFoundException("添加失败！图片为空");
+        }
 
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
@@ -103,7 +110,7 @@ public class AppController {
 
     //修改操作
     @PostMapping("edit")
-    public Result<?> edit(HttpServletRequest request) {
+    public Result<?> edit(MultipartFile icon, HttpServletRequest request) throws IOException {
 
         //使用日志记录器打印消息，表示开始修改app版本信息。
         log.info("开始修改app版本信息");
@@ -111,8 +118,15 @@ public class AppController {
         //获取请求体中的数据
         Map<String, Object> map = AppUpdateController.parameterToMap(request);
 
+        //判断图片是否为空
+        if (null == icon) {
+            throw new FileNotFoundException("添加失败！图片为空");
+        }
+
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
+        //把图片保存到磁盘上，获取图片的存储路径
+        app.setIcon(appUpdateController.transformToPicture(icon));
 
         //设置size值大小
         if (null != app.getFiles()) {
@@ -160,10 +174,15 @@ public class AppController {
 
     //添加新版本
     @PostMapping("addNewVersion")
-    public Result<?> addNewVersion(HttpServletRequest request) {
+    public Result<?> addNewVersion(MultipartFile icon, HttpServletRequest request) throws FileNotFoundException {
 
         //获取请求体中的数据
         Map<String, Object> map = AppUpdateController.parameterToMap(request);
+
+        //判断图片是否为空
+        if (null == icon) {
+            throw new FileNotFoundException("添加失败！图片为空");
+        }
 
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
