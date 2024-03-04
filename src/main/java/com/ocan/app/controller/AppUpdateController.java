@@ -301,8 +301,10 @@ public class AppUpdateController {
         Map<String, String[]> parameterMap = request.getParameterMap();
 
         //判断文件是否为空
-        String[] files = parameterMap.get("files");
-        if (null != files && files[0].equals("undefined")) {
+        String[] files = parameterMap.get("files[]");
+        String[] platforms = parameterMap.get("platform");
+
+        if (null == files && platforms != null) {
             throw new FileNotFoundException("添加失败！上传文件为空！");
         }
 

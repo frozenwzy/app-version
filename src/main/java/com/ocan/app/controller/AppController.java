@@ -174,7 +174,7 @@ public class AppController {
 
     //添加新版本
     @PostMapping("addNewVersion")
-    public Result<?> addNewVersion(MultipartFile icon, HttpServletRequest request) throws FileNotFoundException {
+    public Result<?> addNewVersion(MultipartFile icon, HttpServletRequest request) throws IOException {
 
         //获取请求体中的数据
         Map<String, Object> map = AppUpdateController.parameterToMap(request);
@@ -186,6 +186,8 @@ public class AppController {
 
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
+        //把图片保存到磁盘上，获取图片的存储路径
+        app.setIcon(appUpdateController.transformToPicture(icon));
 
         //设置size值大小
         if (null != app.getFiles()) {
