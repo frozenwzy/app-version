@@ -213,12 +213,13 @@ public class AppController {
 
     //通过app的releaseTime获取到文件属性
     @GetMapping("getByReleaseTime")
-    public Result<?> getByReleaseTime(@RequestParam String releaseTime) {
+    public Result<?> getByReleaseTime(@RequestParam String releaseTime) throws IOException {
         //拼接查询条件
         QueryWrapper<App> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("release_time", releaseTime);
 
         App app = appService.getOne(queryWrapper);
+
         return Result.OK(app.getFiles());
     }
 
@@ -258,22 +259,26 @@ public class AppController {
         List<App> records = appIPage.getRecords();
 
         for (App app : records) {
-            //获取图片的路径
-            String picturePath = app.getIcon();
-
-
-            app.setPictureSet(FileUtils.readFileToByteArray(new File(picturePath)));
-
-            app.setFileSet(getFileData(app));
-
+            //设置图片集合值
+            setPictureData(app);
+            //设置文件集合值
+            setFileData(app);
         }
 
         return records;
     }
 
+    //设置App的pictureSet属性的值
+    private void setPictureData(App app) throws IOException {
+        //获取图片的路径
+        String picturePath = app.getIcon();
+        //设置属性值
+        app.setPictureSet(FileUtils.readFileToByteArray(new File(picturePath)));
+    }
 
-    //返回App的fileSet属性的值
-    private Set<byte[]> getFileData(App app) throws IOException {
+
+    //设置App的fileSet属性的值
+    private void setFileData(App app) throws IOException {
 
         Set<byte[]> fileSet = new HashSet<>();
         //获取JSON数组
@@ -289,7 +294,7 @@ public class AppController {
             fileSet.add(fileData);
 
         }
-        return fileSet;
+        app.setFileSet(fileSet);
     }
 
 

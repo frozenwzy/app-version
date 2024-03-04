@@ -4,7 +4,9 @@ import cn.hutool.core.util.ZipUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ocan.app.entity.App;
+import com.ocan.app.mapper.AppMapper;
 import com.ocan.app.mode.Result;
 import com.ocan.app.service.AppService;
 import com.ocan.app.utils.MD5;
@@ -35,6 +37,9 @@ public class AppUpdateController {
 
     @Autowired
     private AppService appService;
+
+    @Autowired
+    private AppMapper appMapper;
 
     //获取文件的存储根路径
     @Value("${file.uploadFolder}")
@@ -72,20 +77,26 @@ public class AppUpdateController {
     public Result<?> checkNewVersion(@RequestParam String appCode, @RequestParam String platform, @RequestParam String appOwner) {
 
         //拼接所需的SQL语句
+        Page<App> appPage = new Page<>(0,1);
+
         QueryWrapper<App> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("app_Code", appCode).eq("platform", platform).
-                eq("app_Owner", appOwner);
-        //获取查询结果
-        App one = appService.getOne(queryWrapper);
+                eq("app_Owner", appOwner).orderByDesc("version");
 
-        if (one == null) {
+        //获取查询结果
+        Page<App> page = appService.page(appPage, queryWrapper);
+        List<App> appList = page.getRecords();
+
+        if (appList.isEmpty()) {
             return Result.error("检查失败！所查询的软件不存在。");
         }
 
+        App one = appList.get(0);
+
         //装载查询结果的值
-        Map<String, String> map = new HashMap<>();
-        map.put("id", one.getId().toString());
-        map.put("build", one.getBuild().toString());
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", one.getId());
+        map.put("build", one.getBuild());
         map.put("version", one.getVersion());
         map.put("releaseInfo", one.getReleaseInfo());
         map.put("mainFileUrl", getMainFileUrl(one));
