@@ -57,7 +57,7 @@ public class AppController {
 
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
-        //把图片保存到磁盘上，获取图片的存储路径
+        //把图片保存到磁盘上，获取图片的访问路径
         app.setIcon(appUpdateController.transformToPicture(icon));
 
 
@@ -125,7 +125,7 @@ public class AppController {
 
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
-        //把图片保存到磁盘上，获取图片的存储路径
+        //把图片保存到磁盘上，获取图片的访问路径
         app.setIcon(appUpdateController.transformToPicture(icon));
 
         //设置size值大小
@@ -186,7 +186,7 @@ public class AppController {
 
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
-        //把图片保存到磁盘上，获取图片的存储路径
+        //把图片保存到磁盘上，获取图片的访问路径
         app.setIcon(appUpdateController.transformToPicture(icon));
 
         //设置size值大小
@@ -259,8 +259,6 @@ public class AppController {
         List<App> records = appIPage.getRecords();
 
         for (App app : records) {
-            //设置图片集合值
-            setPictureData(app);
             //设置文件集合值
             setFileData(app);
         }
@@ -268,6 +266,7 @@ public class AppController {
         return records;
     }
 
+    /*
     //设置App的pictureSet属性的值
     private void setPictureData(App app) throws IOException {
         //获取图片的路径
@@ -275,6 +274,8 @@ public class AppController {
         //设置属性值
         app.setPictureSet(FileUtils.readFileToByteArray(new File(picturePath)));
     }
+
+     */
 
 
     //设置App的fileSet属性的值

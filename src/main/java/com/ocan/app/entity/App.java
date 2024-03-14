@@ -41,7 +41,7 @@ public class App {
     //应用文件
     @TableField(value = "files", typeHandler = JacksonTypeHandler.class)
     private JSONArray files;
-    //图标路径
+    //图标访问路径
     private String icon;
     //应用编码
     private String appCode;
@@ -52,8 +52,11 @@ public class App {
     @TableField(exist = false)
     private Set<byte[]> fileSet;
 
+    /*
     //存放图片
     @TableField(exist = false)
     private byte[] pictureSet;
+
+     */
 
 }

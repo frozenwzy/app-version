@@ -292,6 +292,9 @@ public class AppUpdateController {
 
         //图片的完整存储路径
         String fileFullPath = rootPath + "picture" + File.separator + file.getOriginalFilename();
+        //获取图片的名字
+        String filename = file.getOriginalFilename();
+
         //创建文件对象
         File saveFile = new File(fileFullPath);
         //判断磁盘上是否存在对应的位置，如果不存在，则创建
@@ -301,8 +304,9 @@ public class AppUpdateController {
 
         //拷贝文件
         FileCopyUtils.copy(file.getBytes(), saveFile);
+        //设置图片的访问路径
 
-        return fileFullPath;
+        return "http://192.168.0.126:9090/meeting/picture/" + filename;
     }
 
     //把前端表单参数转化为键值对存到map中
