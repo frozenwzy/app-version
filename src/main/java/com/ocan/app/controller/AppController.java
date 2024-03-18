@@ -11,7 +11,6 @@ import com.ocan.app.entity.App;
 import com.ocan.app.mode.Result;
 import com.ocan.app.service.AppService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -19,13 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 @RestController //这个注解可以将一个Java类标记为控制器，使其能够处理HTTP请求，并将方法的返回值直接写入HTTP响应体中
@@ -160,8 +156,8 @@ public class AppController {
         lambdaQueryWrapper.like(!StringUtils.isEmpty(name), App::getName, name);
 
         IPage<App> appList = appService.page(page, lambdaQueryWrapper);
-        List<App> apps = modifyFiles(appList);
-        appList.setRecords(apps);
+//        List<App> apps = modifyFiles(appList);
+//        appList.setRecords(apps);
 
         return Result.OK("查询成功", appList);
     }
@@ -174,15 +170,13 @@ public class AppController {
         //获取请求体中的数据
         Map<String, Object> map = AppUpdateController.parameterToMap(request);
 
-        //判断图片是否为空
-        if (null == icon) {
-            throw new FileNotFoundException("添加失败！图片为空");
-        }
-
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
         //把图片保存到磁盘上，获取图片的访问路径
-        app.setIcon(appUpdateController.saveUploadedPicture(icon));
+        if (null != icon) {
+            app.setIcon(appUpdateController.saveUploadedPicture(icon));
+        }
+
 
         //设置size值大小
         if (null != app.getFiles()) {
@@ -249,17 +243,17 @@ public class AppController {
 
 
     //修改查询返回的数据
-    private List<App> modifyFiles(IPage<App> appIPage) throws IOException {
-
-        List<App> records = appIPage.getRecords();
-
-        for (App app : records) {
-            //设置文件集合值
-            setFileData(app);
-        }
-
-        return records;
-    }
+//    private List<App> modifyFiles(IPage<App> appIPage) throws IOException {
+//
+//        List<App> records = appIPage.getRecords();
+//
+//        for (App app : records) {
+//            //设置文件集合值
+//            setFileData(app);
+//        }
+//
+//        return records;
+//    }
 
     /*
     //设置App的pictureSet属性的值
@@ -274,24 +268,24 @@ public class AppController {
 
 
     //设置App的fileSet属性的值
-    private void setFileData(App app) throws IOException {
-
-        Set<byte[]> fileSet = new HashSet<>();
-        //获取JSON数组
-        JSONArray files = app.getFiles();
-
-        //遍历JSON数组
-        for (int i = 0; i < files.size(); i++) {
-            //获取文件的路径
-            String filePath = rootPath + files.getJSONObject(i).getString("file");
-
-            //获取文件的字符格式
-            byte[] fileData = FileUtils.readFileToByteArray(new File(filePath));
-            fileSet.add(fileData);
-
-        }
-        app.setFileSet(fileSet);
-    }
+//    private void setFileData(App app) throws IOException {
+//
+//        Set<byte[]> fileSet = new HashSet<>();
+//        //获取JSON数组
+//        JSONArray files = app.getFiles();
+//
+//        //遍历JSON数组
+//        for (int i = 0; i < files.size(); i++) {
+//            //获取文件的路径
+//            String filePath = rootPath + files.getJSONObject(i).getString("file");
+//
+//            //获取文件的字符格式
+//            byte[] fileData = FileUtils.readFileToByteArray(new File(filePath));
+//            fileSet.add(fileData);
+//
+//        }
+//        app.setFileSet(fileSet);
+//    }
 
 
 }

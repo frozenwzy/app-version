@@ -21,10 +21,6 @@ public class AppVO extends App {
     private String type;
     //判断是否是主文件
     private String isMain;
-    //app的名字
-    private String appName;
-    //是否是最后一个文件
-    private String isLast;
 
 }
 

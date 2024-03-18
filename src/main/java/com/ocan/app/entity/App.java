@@ -48,9 +48,9 @@ public class App {
     //应用所有者
     private String appOwner;
 
-    //存放文件
-    @TableField(exist = false)
-    private Set<byte[]> fileSet;
+//    //存放文件
+//    @TableField(exist = false)
+//    private Set<byte[]> fileSet;
 
     /*
     //存放图片
