@@ -285,11 +285,10 @@ public class AppUpdateController {
     //初始化文件信息，把图片保存在磁盘上，并返回路径
     public String saveUploadedPicture(MultipartFile file) throws IOException {
 
-
-        //获取图片的名字
-        String filename = file.getOriginalFilename();
+        //获取图片的MD5值
+        String md5 = MD5.bufferMD5(file.getBytes());
         //图片的完整存储路径
-        String fileFullPath = rootPath + "picture" + File.separator + filename;
+        String fileFullPath = rootPath + "picture" + File.separator + md5;
 
         //创建文件对象
         File saveFile = new File(fileFullPath);
@@ -298,7 +297,7 @@ public class AppUpdateController {
             //拷贝文件
             FileCopyUtils.copy(file.getBytes(), saveFile);
             //设置图片的访问路径
-            return "http://192.168.0.126:9090/meeting/picture/" + filename;
+            return "http://192.168.0.126:9090/meeting/picture/" + md5;
         } else {
             throw new FileExistsException();
         }

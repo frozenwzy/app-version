@@ -61,7 +61,6 @@ public class AppController {
         //把图片保存到磁盘上，获取图片的访问路径
         app.setIcon(appUpdateController.saveUploadedPicture(icon));
 
-
         //判断添加的应用是否已存在
         if (isAppExist("name", app.getName())) {
             return Result.error("添加失败，该应用已存在!");
@@ -116,15 +115,13 @@ public class AppController {
         //获取请求体中的数据
         Map<String, Object> map = AppUpdateController.parameterToMap(request);
 
-        //判断图片是否为空
-        if (null == icon) {
-            throw new FileNotFoundException("修改失败！图片为空");
-        }
-
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
         //把图片保存到磁盘上，获取图片的访问路径
-        app.setIcon(appUpdateController.saveUploadedPicture(icon));
+        if (null != icon) {
+            app.setIcon(appUpdateController.saveUploadedPicture(icon));
+        }
+
 
         //设置size值大小
         if (null != app.getFiles()) {
