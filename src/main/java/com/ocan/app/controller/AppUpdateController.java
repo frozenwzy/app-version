@@ -10,7 +10,6 @@ import com.ocan.app.mapper.AppMapper;
 import com.ocan.app.mode.Result;
 import com.ocan.app.service.AppService;
 import com.ocan.app.utils.MD5;
-import com.ocan.app.vo.AppVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
@@ -61,11 +60,10 @@ public class AppUpdateController {
         //获取请求体中的参数
         Map<String, Object> map = parameterToMap(request);
 
-        //把JSON数据映射到java实体类
-        AppVO appVO = JSONObject.parseObject(JSONObject.toJSONString(map), AppVO.class);
+        boolean isMain = Boolean.parseBoolean(map.get("isMain").toString());
 
         //上传文件
-        JSONObject jsonObject = transformToJSON(file, appVO);
+        JSONObject jsonObject = transformToJSON(file, isMain);
 
         return Result.OK("上传成功！", jsonObject);
 
@@ -151,7 +149,7 @@ public class AppUpdateController {
                 //获取JSON对象
                 jsonObject = files.getJSONObject(i);
                 //返回文件下载地址
-                filePath = jsonObject.getString("file");
+                filePath = rootPath + jsonObject.getString("file");
                 //设置文件下载大小
                 size = jsonObject.getLong("size");
                 break;
@@ -177,7 +175,7 @@ public class AppUpdateController {
         JSONObject jsonObject = jsonArray.getJSONObject(0);
 
         //文件的下载路径
-        String filePath = jsonObject.getString("file");
+        String filePath = rootPath +  jsonObject.getString("file");
         //设置下载的文件名
         String name = jsonObject.getString("name");
         //文件的大小
@@ -187,7 +185,7 @@ public class AppUpdateController {
         //如果是多个文件
         if (app.getFiles().size() != 1) {
             //获取文件的存放位置
-            File file = new File(filePath);
+            File file = new File(rootPath + filePath);
             String parentFile = file.getParent();
             //压缩文件，该工具类可能会被攻击
             ZipUtil.zip(parentFile);
@@ -240,73 +238,70 @@ public class AppUpdateController {
     }
 
     //初始化文件信息，把文件对象转为JSON对象，并保存在磁盘上
-    private JSONObject transformToJSON(MultipartFile file, AppVO appVO) throws IOException {
+    private JSONObject transformToJSON(MultipartFile file, boolean isMain) throws IOException {
 
         //获取当前年月
-        String format = new SimpleDateFormat("yyyy-MM").format(new Date());
+        String format = new SimpleDateFormat("yyyyMM").format(new Date());
         //创建用于保存文件信息的JSON对象
         JSONObject jsonFile = new JSONObject();
 
         //获取文件的MD5值
         String md5 = MD5.bufferMD5(file.getBytes());
+        //获取保存文件的名字
+        String fileName = MD5.stringMD5(md5 + file.getOriginalFilename());
 
-        //把文件的MD5放到集合中
-        boolean isSuccess = md5List.add(md5);
-        if (!isSuccess) {
-            throw new FileExistsException();
-        }
-        //如果是最后一个文件，重置set集合
-        if ("true".equals(appVO.getIsLast())) {
-            md5List.clear();
-        }
+        //获取文件的后缀名
+        String fileSuffixName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+        //设置文件保存在数据库中的路径
+        String saveFileName = format + File.separator + fileName + fileSuffixName;
 
 
         //创建文件对象
-        File saveFile = new File(rootPath + format + File.separator
-                + appVO.getAppName() + File.separator + appVO.getName());
-        //判断磁盘上是否存在对应的位置，如果不存在，则创建
-        if (!saveFile.getParentFile().exists()) {
-            saveFile.getParentFile().mkdirs();
+        File saveFile = new File(rootPath + saveFileName);
+
+        //判断磁盘上是否存在文件
+        if (saveFile.createNewFile()) {
+            //拷贝文件
+            FileCopyUtils.copy(file.getBytes(), saveFile);
+            //设置文件的属性
+            //设置文件的磁盘路径
+            jsonFile.put("file", saveFileName);
+            //设置文件名
+            jsonFile.put("name", file.getOriginalFilename());
+            //设置文件大小
+            jsonFile.put("size", file.getSize());
+            //设置文件的MD5值
+            jsonFile.put("md5", md5);
+            //设置文件的类型
+            jsonFile.put("type", file.getContentType());
+            //设置是否是主文件
+            jsonFile.put("isMain", isMain);
+        } else {
+            throw new FileExistsException();
         }
-        //拷贝文件
-        FileCopyUtils.copy(file.getBytes(), saveFile);
-
-        //设置文件的磁盘路径
-        jsonFile.put("file", saveFile);
-        //设置文件名
-        jsonFile.put("name", appVO.getName());
-        //设置文件大小
-        jsonFile.put("size", file.getSize());
-        //设置文件的MD5值
-        jsonFile.put("md5", md5);
-        //设置文件的类型
-        jsonFile.put("type", file.getContentType());
-        //设置是否是主文件
-        jsonFile.put("isMain", appVO.getIsMain());
-
         return jsonFile;
     }
 
     //初始化文件信息，把图片保存在磁盘上，并返回路径
-    public String transformToPicture(MultipartFile file) throws IOException {
+    public String saveUploadedPicture(MultipartFile file) throws IOException {
 
-        //图片的完整存储路径
-        String fileFullPath = rootPath + "picture" + File.separator + file.getOriginalFilename();
+
         //获取图片的名字
         String filename = file.getOriginalFilename();
+        //图片的完整存储路径
+        String fileFullPath = rootPath + "picture" + File.separator + filename;
 
         //创建文件对象
         File saveFile = new File(fileFullPath);
-        //判断磁盘上是否存在对应的位置，如果不存在，则创建
-        if (!saveFile.getParentFile().exists()) {
-            saveFile.getParentFile().mkdirs();
+        //判断图片是否存在
+        if (saveFile.createNewFile()) {
+            //拷贝文件
+            FileCopyUtils.copy(file.getBytes(), saveFile);
+            //设置图片的访问路径
+            return "http://192.168.0.126:9090/meeting/picture/" + filename;
+        } else {
+            throw new FileExistsException();
         }
-
-        //拷贝文件
-        FileCopyUtils.copy(file.getBytes(), saveFile);
-        //设置图片的访问路径
-
-        return "http://192.168.0.126:9090/meeting/picture/" + filename;
     }
 
     //把前端表单参数转化为键值对存到map中
@@ -315,36 +310,30 @@ public class AppUpdateController {
         //从请求体中获取所有键值对数据
         Map<String, String[]> parameterMap = request.getParameterMap();
 
-        //判断文件是否为空
-        String[] files = parameterMap.get("files[]");
-        String[] platforms = parameterMap.get("platform");
-
-        if (null == files && platforms != null) {
-            throw new FileNotFoundException("添加失败！上传文件为空！");
-        }
-
         HashMap<String, Object> map = new HashMap<>();
         JSONArray jsonArray = new JSONArray();
 
         //遍历parameterMap集合，把v[0]赋值给map集合
         parameterMap.forEach((k, v) -> {
-            //找出发送的JSON字符串
-            if (k.equals("files[]")) {
-
-                //把JSON字符串转为JSON对象
-                String[] strings = parameterMap.get("files[]");
-                for (String string : strings) {
-                    jsonArray.add(JSONObject.parseObject(string));
+            //找出前端发送的JSON字符串
+            if ("files[]".equals(k)) {
+                if (v != null) {
+                    //把JSON字符串转为JSON对象
+                    for (String string : v) {
+                        jsonArray.add(JSONObject.parseObject(string));
+                    }
+                    map.put("files", jsonArray);
                 }
-                map.put("files", jsonArray);
             } else {
-                map.put(k, v[0]);
+                if (v.length > 0 && v[0] != null) {
+                    map.put(k, v[0]);
+                }
+
             }
         });
 
         return map;
     }
-
 
 
 }

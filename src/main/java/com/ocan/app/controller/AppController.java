@@ -13,6 +13,7 @@ import com.ocan.app.service.AppService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,14 +39,14 @@ public class AppController {
     @Autowired
     private AppUpdateController appUpdateController;
 
+    //获取文件的存储根路径
+    @Value("${file.uploadFolder}")
+    private  String rootPath;
+
 
     //增加操作
     @PostMapping("add")
     public Result<?> add(MultipartFile icon, HttpServletRequest request) throws IOException {
-
-
-        //使用日志记录器打印消息，表示开始添加app版本信息。
-        log.info("开始添加app版本信息");
 
         //获取请求体中的数据
         Map<String, Object> map = AppUpdateController.parameterToMap(request);
@@ -58,7 +59,7 @@ public class AppController {
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
         //把图片保存到磁盘上，获取图片的访问路径
-        app.setIcon(appUpdateController.transformToPicture(icon));
+        app.setIcon(appUpdateController.saveUploadedPicture(icon));
 
 
         //判断添加的应用是否已存在
@@ -90,7 +91,7 @@ public class AppController {
         if (whetherSuccess) {
             return Result.ok("删除成功！");
         } else {
-            return Result.error("删除失败，要删除的id不存在！");
+            return Result.error("删除失败！");
         }
     }
 
@@ -103,7 +104,7 @@ public class AppController {
         if (whetherSuccess) {
             return Result.ok("批量删除成功！");
         } else {
-            return Result.error("批量删除失败，要删除的id不存在！");
+            return Result.error("批量删除失败！");
         }
     }
 
@@ -112,21 +113,18 @@ public class AppController {
     @PostMapping("edit")
     public Result<?> edit(MultipartFile icon, HttpServletRequest request) throws IOException {
 
-        //使用日志记录器打印消息，表示开始修改app版本信息。
-        log.info("开始修改app版本信息");
-
         //获取请求体中的数据
         Map<String, Object> map = AppUpdateController.parameterToMap(request);
 
         //判断图片是否为空
         if (null == icon) {
-            throw new FileNotFoundException("添加失败！图片为空");
+            throw new FileNotFoundException("修改失败！图片为空");
         }
 
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
         //把图片保存到磁盘上，获取图片的访问路径
-        app.setIcon(appUpdateController.transformToPicture(icon));
+        app.setIcon(appUpdateController.saveUploadedPicture(icon));
 
         //设置size值大小
         if (null != app.getFiles()) {
@@ -187,7 +185,7 @@ public class AppController {
         //把JSON数据映射到实体类
         App app = JSONObject.parseObject(JSONObject.toJSONString(map), App.class);
         //把图片保存到磁盘上，获取图片的访问路径
-        app.setIcon(appUpdateController.transformToPicture(icon));
+        app.setIcon(appUpdateController.saveUploadedPicture(icon));
 
         //设置size值大小
         if (null != app.getFiles()) {
@@ -242,14 +240,14 @@ public class AppController {
     //计算文件的总大小
     private Long totalSize(JSONArray jsonArray) {
         //临时保存文件总大小
-        long sum = 0;
+        long totalFileSize = 0;
 
         //循环获取JSON数组中键为size的值
         for (int i = 0; i < jsonArray.size(); i++) {
-            sum += jsonArray.getJSONObject(i).getLong("size");
+            totalFileSize += jsonArray.getJSONObject(i).getLong("size");
         }
 
-        return sum;
+        return totalFileSize;
     }
 
 
@@ -288,7 +286,7 @@ public class AppController {
         //遍历JSON数组
         for (int i = 0; i < files.size(); i++) {
             //获取文件的路径
-            String filePath = files.getJSONObject(i).getString("file");
+            String filePath = rootPath + files.getJSONObject(i).getString("file");
 
             //获取文件的字符格式
             byte[] fileData = FileUtils.readFileToByteArray(new File(filePath));

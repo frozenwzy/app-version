@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     //上传的文件中存在相同的文件异常
     @ExceptionHandler(FileExistsException.class)
     public Result<String> handlerFileExistsException(FileExistsException e) {
-        return Result.error("上传失败，上传的文件中存在相同的文件！");
+        return Result.error("上传失败，上传的文件中存在重复文件！");
     }
 
 
