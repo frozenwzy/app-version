@@ -1,6 +1,7 @@
 package com.ocan.app.controller;
 
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ocan.app.entity.User;
@@ -17,14 +18,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
-@RequestMapping("user")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     //新增用户
-    @PostMapping("add")
+    @PostMapping("/add")
     public Result<?> addUser(@RequestBody User user) {
 
         if (isExist(user)) {
@@ -52,7 +53,7 @@ public class UserController {
 
 
     //删除用户
-    @GetMapping("delete")
+    @GetMapping("/delete")
     public Result<String> deleteUser(@RequestParam("id") Long id) {
 
         boolean whetherSuccess = userService.removeById(id);
@@ -66,7 +67,7 @@ public class UserController {
 
 
     //批量删除用户
-    @GetMapping("deleteBatch")
+    @GetMapping("/deleteBatch")
     public Result<String> deleteBatch(@RequestParam("list") List<Long> list) {
 
         boolean whetherSuccess = userService.removeByIds(list);
@@ -81,7 +82,7 @@ public class UserController {
 
 
     //修改用户
-    @PostMapping("edit")
+    @PostMapping("/edit")
     public Result<String> exitUser(@RequestBody User user) {
 
 
@@ -104,7 +105,7 @@ public class UserController {
 
 
     //查询用户
-    @GetMapping("list")
+    @GetMapping("/list")
     public Result<?> selectUser(
                                 @RequestParam(name = "current", defaultValue = "1") Integer pageNo,
                                 @RequestParam(name = "size", defaultValue = "10") Integer pageSize,
@@ -132,7 +133,7 @@ public class UserController {
     }
 
     //测试异常
-    @GetMapping("test")
+    @GetMapping("/test")
     public Result<?> test() {
 
         String str = null;
@@ -146,11 +147,11 @@ public class UserController {
     //根据username来判断数据库中是否存在重复数据
     public boolean isExist(User user) {
 
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", user.getUsername());
-        User one = userService.getOne(queryWrapper);
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(User::getUsername, user.getUsername());
+        User existUser = userService.getOne(lambdaQueryWrapper);
 
-        return one != null;
+        return existUser != null;
     }
 
 

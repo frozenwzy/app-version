@@ -1,0 +1,126 @@
+2024-03-28 09:01:55.980 [main] INFO  com.ocan.app.AppVersionApplication:55 - Starting AppVersionApplication on LAPTOP-MI1O0NSR with PID 11416 (D:\User\IdeaProjects\app-version\target\classes started by frozen in D:\User\IdeaProjects\app-version)
+2024-03-28 09:01:56.007 [main] INFO  com.ocan.app.AppVersionApplication:655 - The following profiles are active: dev
+2024-03-28 09:01:56.541 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer:92 - Tomcat initialized with port(s): 49040 (http)
+2024-03-28 09:01:56.546 [main] INFO  org.apache.coyote.http11.Http11NioProtocol:173 - Initializing ProtocolHandler ["http-nio-49040"]
+2024-03-28 09:01:56.546 [main] INFO  org.apache.catalina.core.StandardService:173 - Starting service [Tomcat]
+2024-03-28 09:01:56.547 [main] INFO  org.apache.catalina.core.StandardEngine:173 - Starting Servlet engine: [Apache Tomcat/9.0.27]
+2024-03-28 09:01:56.585 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/appserver]:173 - Initializing Spring embedded WebApplicationContext
+2024-03-28 09:01:56.585 [main] INFO  org.springframework.web.context.ContextLoader:284 - Root WebApplicationContext: initialization completed in 552 ms
+2024-03-28 09:01:57.086 [main] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor:171 - Initializing ExecutorService 'applicationTaskExecutor'
+2024-03-28 09:01:57.192 [main] INFO  org.apache.coyote.http11.Http11NioProtocol:173 - Starting ProtocolHandler ["http-nio-49040"]
+2024-03-28 09:01:57.203 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer:204 - Tomcat started on port(s): 49040 (http) with context path '/appserver'
+2024-03-28 09:01:57.205 [main] INFO  com.ocan.app.AppVersionApplication:61 - Started AppVersionApplication in 1.498 seconds (JVM running for 1.92)
+2024-03-28 09:02:00.997 [http-nio-49040-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/appserver]:173 - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-03-28 09:02:00.998 [http-nio-49040-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet:525 - Initializing Servlet 'dispatcherServlet'
+2024-03-28 09:02:01.004 [http-nio-49040-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet:547 - Completed initialization in 6 ms
+2024-03-28 09:02:01.012 [http-nio-49040-exec-1] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appVersion/list
+2024-03-28 09:02:01.013 [http-nio-49040-exec-1] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:02:01.114 [http-nio-49040-exec-1] INFO  com.zaxxer.hikari.HikariDataSource:110 - HikariPool-1 - Starting...
+2024-03-28 09:02:01.490 [http-nio-49040-exec-1] INFO  com.zaxxer.hikari.HikariDataSource:123 - HikariPool-1 - Start completed.
+2024-03-28 09:02:05.145 [http-nio-49040-exec-2] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/system/randomImage
+2024-03-28 09:02:05.145 [http-nio-49040-exec-2] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:02:05.165 [http-nio-49040-exec-2] INFO  com.ocan.app.controller.SystemController:51 - 获取验证码,Session checkCode = kyWm,
+2024-03-28 09:10:20.567 [http-nio-49040-exec-3] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appVersion/list
+2024-03-28 09:10:20.567 [http-nio-49040-exec-3] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:25.207 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/system/randomImage
+2024-03-28 09:10:25.208 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:25.208 [http-nio-49040-exec-4] INFO  com.ocan.app.controller.SystemController:51 - 获取验证码,Session checkCode = JXvV,
+2024-03-28 09:10:28.462 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appVersion/listAll
+2024-03-28 09:10:28.463 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.544 [http-nio-49040-exec-6] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/952d4e5a1fe86467cd1432097d4fae65.png
+2024-03-28 09:10:28.545 [http-nio-49040-exec-6] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.546 [http-nio-49040-exec-1] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/eb878014328d71451dd3f9034de8ba93.png
+2024-03-28 09:10:28.546 [http-nio-49040-exec-10] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/860ff54395fd95733a118067a096b2ae.png
+2024-03-28 09:10:28.546 [http-nio-49040-exec-8] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/0452742915d61d241fb8689a2ed1bbaf.png
+2024-03-28 09:10:28.546 [http-nio-49040-exec-9] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/7542015d4d201a54bc0fa678b4a59096.png
+2024-03-28 09:10:28.546 [http-nio-49040-exec-7] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/e82541462ecf72bd8776a3f365bef44f.png
+2024-03-28 09:10:28.547 [http-nio-49040-exec-1] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.547 [http-nio-49040-exec-8] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.547 [http-nio-49040-exec-10] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.547 [http-nio-49040-exec-9] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.547 [http-nio-49040-exec-7] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.573 [http-nio-49040-exec-3] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/aba32b8a991b430469f33c4b08b9a7be.png
+2024-03-28 09:10:28.578 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/a6baade75cebb356d58078240feb4b6a.png
+2024-03-28 09:10:28.573 [http-nio-49040-exec-2] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/6c2e02fe363cc7dd48bab388b485fd8e.png
+2024-03-28 09:10:28.578 [http-nio-49040-exec-10] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/d14446584e12e49edebaa41ebec07df2.png
+2024-03-28 09:10:28.578 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/aac5cf2bfaa8df3a2329247193b0da78.png
+2024-03-28 09:10:28.578 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.578 [http-nio-49040-exec-10] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.578 [http-nio-49040-exec-2] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.578 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.578 [http-nio-49040-exec-3] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.578 [http-nio-49040-exec-1] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/bf4273a73096b88dec78448bd1234911.png
+2024-03-28 09:10:28.579 [http-nio-49040-exec-1] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:28.591 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/ef7aa523da48e7bb22ee69da0b29d66c.png
+2024-03-28 09:10:28.592 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:43.048 [http-nio-49040-exec-6] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appUpdate/downloadVersionFile
+2024-03-28 09:10:43.049 [http-nio-49040-exec-6] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:45.906 [http-nio-49040-exec-7] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/system/randomImage
+2024-03-28 09:10:45.907 [http-nio-49040-exec-7] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:45.908 [http-nio-49040-exec-7] INFO  com.ocan.app.controller.SystemController:51 - 获取验证码,Session checkCode = LFFN,
+2024-03-28 09:10:55.215 [http-nio-49040-exec-8] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/system/login
+2024-03-28 09:10:55.216 [http-nio-49040-exec-8] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:10:55.382 [http-nio-49040-exec-8] INFO  com.ocan.app.controller.SystemController:112 - 生成token:eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MTIxOTMwNTUsImlkIjoyOH0.2JbDsMNs3g2Er_Y_vbnGfEIRsaMTbxYQH3vvTO-AlZRkNaFpsffbCz0d33sX-s4ixYuHeE1TEWgXP4ZsmNbz-g
+2024-03-28 09:10:55.869 [http-nio-49040-exec-9] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appVersion/list
+2024-03-28 09:10:55.870 [http-nio-49040-exec-9] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:11:03.530 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appVersion/list
+2024-03-28 09:11:03.531 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:13:38.403 [http-nio-49040-exec-9] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appUpdate/upload
+2024-03-28 09:13:38.403 [http-nio-49040-exec-9] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:13:47.936 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appVersion/add
+2024-03-28 09:13:47.936 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:64 - 该路径被拦截
+2024-03-28 09:13:47.936 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:67 - token:eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MTIxOTMwNTUsImlkIjoyOH0.2JbDsMNs3g2Er_Y_vbnGfEIRsaMTbxYQH3vvTO-AlZRkNaFpsffbCz0d33sX-s4ixYuHeE1TEWgXP4ZsmNbz-g
+2024-03-28 09:13:48.255 [http-nio-49040-exec-10] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appVersion/list
+2024-03-28 09:13:48.256 [http-nio-49040-exec-10] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:14:11.527 [http-nio-49040-exec-3] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/system/randomImage
+2024-03-28 09:14:11.528 [http-nio-49040-exec-3] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:14:11.528 [http-nio-49040-exec-3] INFO  com.ocan.app.controller.SystemController:51 - 获取验证码,Session checkCode = MfSZ,
+2024-03-28 09:14:13.948 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appVersion/listAll
+2024-03-28 09:14:13.949 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:14:13.993 [http-nio-49040-exec-2] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/2103f2934d3da63047970f38b8da2f23.png
+2024-03-28 09:14:13.993 [http-nio-49040-exec-2] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:14:16.046 [http-nio-49040-exec-6] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/appUpdate/downloadVersionFile
+2024-03-28 09:14:16.046 [http-nio-49040-exec-6] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:18:24.805 [http-nio-49040-exec-9] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/system/randomImage
+2024-03-28 09:18:24.806 [http-nio-49040-exec-9] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 09:18:24.807 [http-nio-49040-exec-9] INFO  com.ocan.app.controller.SystemController:51 - 获取验证码,Session checkCode = 0pgz,
+2024-03-28 15:30:40.483 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/
+2024-03-28 15:30:40.495 [http-nio-49040-exec-4] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 15:30:46.874 [http-nio-49040-exec-3] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/
+2024-03-28 15:30:46.875 [http-nio-49040-exec-3] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 15:31:08.518 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/ef7aa523da48e7bb22ee69da0b29d66c.png
+2024-03-28 15:31:08.518 [http-nio-49040-exec-5] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 15:31:13.186 [http-nio-49040-exec-2] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/ef7aa523da48e7bb22ee69da0b29d66c.png
+2024-03-28 15:31:13.186 [http-nio-49040-exec-2] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 15:31:44.914 [http-nio-49040-exec-1] INFO  com.ocan.app.filter.AuthorizeFilter:52 - 拦截到请求，路径是:/appserver/uploads/picture/ef7aa523da48e7bb22ee69da0b29d66c.png
+2024-03-28 15:31:44.914 [http-nio-49040-exec-1] INFO  com.ocan.app.filter.AuthorizeFilter:56 - 不需要拦截的路径，直接放行
+2024-03-28 16:14:17.404 [http-nio-49040-exec-9] INFO  org.apache.coyote.http11.Http11Processor:175 - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:415)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:292)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1579)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:750)
+2024-03-28 16:37:35.781 [http-nio-49040-exec-1] INFO  org.apache.coyote.http11.Http11Processor:175 - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:415)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:292)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:861)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1579)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:750)
+2024-03-28 17:31:43.400 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool:787 - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m4s248ms936µs599ns).
+2024-03-28 17:31:53.537 [SpringContextShutdownHook] INFO  o.s.scheduling.concurrent.ThreadPoolTaskExecutor:208 - Shutting down ExecutorService 'applicationTaskExecutor'
+2024-03-28 17:31:53.540 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource:350 - HikariPool-1 - Shutdown initiated...
+2024-03-28 17:31:53.547 [SpringContextShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource:352 - HikariPool-1 - Shutdown completed.

@@ -2,7 +2,7 @@ package com.ocan.app.controller;
 
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.ocan.app.dto.SystemLogin;
 import com.ocan.app.entity.User;
@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RestController()
-@RequestMapping("system")
+@RequestMapping("/system")
 public class SystemController {
 
     @Autowired
@@ -35,7 +35,7 @@ public class SystemController {
     private UserController userController;
 
     //生成验证码
-    @PostMapping("randomImage")
+    @PostMapping("/randomImage")
     public void randomImage(HttpServletRequest request,
                             HttpServletResponse response) {
 
@@ -64,7 +64,7 @@ public class SystemController {
 
 
     //用户登录接口
-    @PostMapping("login")
+    @PostMapping("/login")
     public Result<JSONObject> login(HttpServletRequest request,
                                     @RequestBody SystemLogin systemLogin) {
 
@@ -86,37 +86,35 @@ public class SystemController {
         }
 
         //根据用户名获取数据库中的数据
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username", username);
-        User one = userService.getOne(queryWrapper);
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(User::getUsername, username);
+        User ExistUser = userService.getOne(lambdaQueryWrapper);
 
         //判断用户是否存在
-        if (one == null) {
+        if (ExistUser == null) {
             return result.error500("用户名错误或该用户不存在！");
         }
         //判断用户是否被禁用
-
-        if (one.getStatus().equals(Constants.SYS_USER_DISABLE)) {
+        if (ExistUser.getStatus().equals(Constants.SYS_USER_DISABLE)) {
             return result.error500("该用户已被禁用！");
         }
-
         //判断用户的密码是否正确
-        String md5DigestAsHex = DigestUtils.md5DigestAsHex((password + one.getSalt()).getBytes(StandardCharsets.UTF_8));
-        String sysPassword = one.getPassword();
+        String md5DigestAsHex = DigestUtils.md5DigestAsHex((password + ExistUser.getSalt()).getBytes(StandardCharsets.UTF_8));
+        String sysPassword = ExistUser.getPassword();
         if (!sysPassword.equals(md5DigestAsHex)) {
             return result.error500("密码错误！");
         }
 
         //登录成功，生成并返回token以及返回用户信息
-        String token = JwtUtil.getToken(one.getId());
+        String token = JwtUtil.getToken(ExistUser.getId());
         log.info("生成token:{}", token);
 
         //封装返回的信息
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("token", token);
-        one.setSalt(null);
-        one.setPassword(null);
-        jsonObject.put("sysUser", one);
+        ExistUser.setSalt(null);
+        ExistUser.setPassword(null);
+        jsonObject.put("sysUser", ExistUser);
         result.success("登录成功！");
         result.setResult(jsonObject);
         return result;
@@ -125,7 +123,7 @@ public class SystemController {
 
 
     //用户注册接口
-    @PostMapping("register")
+    @PostMapping("/register")
     public Result<?> addUser(@RequestBody User user) {
 
         //判断注册的用户是否存在
@@ -153,8 +151,8 @@ public class SystemController {
 
 
     //冻结后台账户
-    @GetMapping ("frozen")
-    public Result<?> frozen(@RequestParam Long id) {
+    @GetMapping ("/frozen")
+    public Result<?> frozen(@RequestParam(name = "id") Long id) {
 
         LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
 

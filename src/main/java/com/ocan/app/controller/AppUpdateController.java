@@ -1,9 +1,8 @@
 package com.ocan.app.controller;
 
-import cn.hutool.core.util.ZipUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ocan.app.entity.App;
 import com.ocan.app.mapper.AppMapper;
@@ -15,7 +14,6 @@ import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -44,12 +45,11 @@ public class AppUpdateController {
     @Value("${file.uploadFolder}")
     private  String rootPath;
 
-    //临时存放文件的MD5
-    private Set<String> md5List = new HashSet<>();
-
+    @Value("${image.access}")
+    private String imageAccess;
 
     //单文件上传
-    @PostMapping("upload")
+    @PostMapping("/upload")
     public Result<?> upload(MultipartFile file, HttpServletRequest request) throws IOException {
 
         //判断是否接收到文件
@@ -59,7 +59,6 @@ public class AppUpdateController {
 
         //获取请求体中的参数
         Map<String, Object> map = parameterToMap(request);
-
         boolean isMain = Boolean.parseBoolean(map.get("isMain").toString());
 
         //上传文件
@@ -71,40 +70,40 @@ public class AppUpdateController {
 
 
     //检查新版本
-    @GetMapping("checkNewVersion")
-    public Result<?> checkNewVersion(@RequestParam String appCode, @RequestParam String platform, @RequestParam String appOwner) {
+    @GetMapping("/checkNewVersion")
+    public Result<?> checkNewVersion(@RequestParam String appCode, @RequestParam String platform, @RequestParam String appOwner) throws FileNotFoundException {
 
         //拼接所需的SQL语句
         Page<App> appPage = new Page<>(0,1);
 
-        QueryWrapper<App> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("app_Code", appCode).eq("platform", platform).
-                eq("app_Owner", appOwner).orderByDesc("version");
+        LambdaQueryWrapper<App> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(App::getAppCode, appCode).eq(App::getPlatform, platform)
+                .eq(App::getAppOwner, appOwner).orderByDesc(App::getVersion);
 
         //获取查询结果
-        Page<App> page = appService.page(appPage, queryWrapper);
+        Page<App> page = appService.page(appPage, lambdaQueryWrapper);
         List<App> appList = page.getRecords();
 
         if (appList.isEmpty()) {
             return Result.error("检查失败！所查询的软件不存在。");
         }
 
-        App one = appList.get(0);
+        App existApp = appList.get(0);
 
         //装载查询结果的值
         Map<String, Object> map = new HashMap<>();
-        map.put("id", one.getId());
-        map.put("build", one.getBuild());
-        map.put("version", one.getVersion());
-        map.put("releaseInfo", one.getReleaseInfo());
-        map.put("mainFileUrl", getMainFileUrl(one));
+        map.put("id", existApp.getId());
+        map.put("build", existApp.getBuild());
+        map.put("version", existApp.getVersion());
+        map.put("releaseInfo", existApp.getReleaseInfo());
+        map.put("mainFileUrl", getMainFileUrl(existApp));
 
         return Result.OK("检查成功！", map);
     }
 
 
     //下载主文件
-    @GetMapping("downloadMainVersionFile")
+    @GetMapping("/downloadMainVersionFile")
     public void downloadMainVersionFile(@RequestParam Long id, @RequestParam String transformInfo, HttpServletResponse response) throws IOException {
         App app = appService.getById(id);
         JSONArray files = app.getFiles();
@@ -119,7 +118,7 @@ public class AppUpdateController {
                 //获取JSON对象
                 jsonObject = files.getJSONObject(i);
                 //返回文件下载地址
-                filePath = jsonObject.getString("file");
+                filePath = rootPath + jsonObject.getString("file");
                 //设置文件下载大小
                 size = jsonObject.getLong("size");
                 break;
@@ -134,7 +133,7 @@ public class AppUpdateController {
 
 
     //下载指定文件
-    @GetMapping("downloadVersionFile")
+    @GetMapping("/downloadVersionFile")
     public void downloadApp(@RequestParam Long id, @RequestParam String md5, HttpServletResponse response) throws IOException {
         App app = appService.getById(id);
         JSONArray files = app.getFiles();
@@ -162,44 +161,15 @@ public class AppUpdateController {
         transferFile(response, name, filePath, size);
     }
 
+    //根据app的Name返回图片的二进制数据
+    @GetMapping("/getImageByte")
+    public byte[] getImageByte(@RequestParam(name = "appName") String appName) throws IOException {
 
-    //下载所有文件
-    @GetMapping("downloadAll")
-    public void downloadAll(@RequestParam Long id, HttpServletResponse response) throws IOException {
+        LambdaQueryWrapper<App> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(App::getName, appName);
 
-        //记录下载的app的id和下载时间
-        log.info("time = {},开始下载app,appId = {}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), id);
-        //获取指定id的app对象
-        App app = appService.getById(id);
-        JSONArray jsonArray = app.getFiles();
-        JSONObject jsonObject = jsonArray.getJSONObject(0);
-
-        //文件的下载路径
-        String filePath = rootPath +  jsonObject.getString("file");
-        //设置下载的文件名
-        String name = jsonObject.getString("name");
-        //文件的大小
-        Long size = app.getSize();
-
-
-        //如果是多个文件
-        if (app.getFiles().size() != 1) {
-            //获取文件的存放位置
-            File file = new File(rootPath + filePath);
-            String parentFile = file.getParent();
-            //压缩文件，该工具类可能会被攻击
-            ZipUtil.zip(parentFile);
-            //对应磁盘上的压缩文件
-            File zipFile = new File(parentFile + ".zip");
-            size = zipFile.length();
-            name = zipFile.getName();
-            filePath = zipFile.getAbsolutePath();
-
-        }
-
-        //传输文件
-        transferFile(response, name, filePath, size);
-
+        App exitApp = appService.getOne(lambdaQueryWrapper);
+        return FileUtils.readFileToByteArray(new File(exitApp.getIcon()));
     }
 
 
@@ -220,17 +190,19 @@ public class AppUpdateController {
 
 
     //获取App主文件的下载地址
-    private String getMainFileUrl(App app) {
+    private String getMainFileUrl(App app) throws FileNotFoundException {
 
         JSONArray files = app.getFiles();
+
+        if (files.isEmpty()) {
+            throw new FileNotFoundException("该app的文件为空！");
+        }
 
         //当有多个文件时
         for (int i = 0; i < files.size(); i++) {
             if (files.getJSONObject(i).getBoolean("isMain")) {
-                //获取JSON对象
-                JSONObject jsonObject = files.getJSONObject(i);
                 //返回文件下载地址
-                return jsonObject.getString("file");
+                return rootPath + files.getJSONObject(i).getString("file");
             }
         }
 
@@ -253,16 +225,18 @@ public class AppUpdateController {
         //获取文件的后缀名
         String fileSuffixName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
         //设置文件保存在数据库中的路径
-        String saveFileName = format + File.separator + fileName + fileSuffixName;
-
+        String saveFileName = "files" + File.separator + format + File.separator + fileName + fileSuffixName;
 
         //创建文件对象
-        File saveFile = new File(rootPath + saveFileName);
-
-        //判断磁盘上是否存在文件
-        if (saveFile.createNewFile()) {
+        File tempFile = new File(rootPath + saveFileName);
+        //判断文件是否已经存在
+        if (tempFile.exists()) {
+            throw new FileExistsException("上传失败，上传的文件已存在！");
+        } else {
+            tempFile.getParentFile().mkdirs();
             //拷贝文件
-            FileCopyUtils.copy(file.getBytes(), saveFile);
+            file.transferTo(tempFile);
+
             //设置文件的属性
             //设置文件的磁盘路径
             jsonFile.put("file", saveFileName);
@@ -276,10 +250,31 @@ public class AppUpdateController {
             jsonFile.put("type", file.getContentType());
             //设置是否是主文件
             jsonFile.put("isMain", isMain);
-        } else {
-            throw new FileExistsException();
+
+            return jsonFile;
         }
-        return jsonFile;
+//        if (tempFile.createNewFile()) {
+//            //拷贝文件
+//            FileCopyUtils.copy(file.getBytes(), tempFile);
+//            //设置文件的属性
+//            //设置文件的磁盘路径
+//            jsonFile.put("file", saveFileName);
+//            //设置文件名
+//            jsonFile.put("name", file.getOriginalFilename());
+//            //设置文件大小
+//            jsonFile.put("size", file.getSize());
+//            //设置文件的MD5值
+//            jsonFile.put("md5", md5);
+//            //设置文件的类型
+//            jsonFile.put("type", file.getContentType());
+//            //设置是否是主文件
+//            jsonFile.put("isMain", isMain);
+//
+//            return jsonFile;
+//        } else {
+//
+//        }
+
     }
 
     //初始化文件信息，把图片保存在磁盘上，并返回路径
@@ -287,20 +282,34 @@ public class AppUpdateController {
 
         //获取图片的MD5值
         String md5 = MD5.bufferMD5(file.getBytes());
+        //获取图片保存的名字
+        String pictureName = MD5.stringMD5(md5 + file.getOriginalFilename());
+        //获取图片的后缀名
+        String fileSuffixName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
         //图片的完整存储路径
-        String fileFullPath = rootPath + "picture" + File.separator + md5;
+        String fileFullPath = rootPath + "picture" + File.separator + pictureName + fileSuffixName;
 
         //创建文件对象
-        File saveFile = new File(fileFullPath);
+        File tempFile = new File(fileFullPath);
         //判断图片是否存在
-        if (saveFile.createNewFile()) {
-            //拷贝文件
-            FileCopyUtils.copy(file.getBytes(), saveFile);
-            //设置图片的访问路径
-            return "http://192.168.0.126:9090/meeting/picture/" + md5;
+        if (tempFile.exists()) {
+            throw new FileExistsException("添加失败，app图片已存在！");
         } else {
-            throw new FileExistsException();
+            tempFile.getParentFile().mkdirs();
+            //拷贝文件
+            file.transferTo(tempFile);
+            //设置图片的访问路径
+            return imageAccess + pictureName + fileSuffixName;
         }
+
+//        if (tempFile.createNewFile()) {
+//            //拷贝文件
+//            FileCopyUtils.copy(file.getBytes(), tempFile);
+//            //设置图片的访问路径
+//            return imageAccess + pictureName + fileSuffixName;
+//        } else {
+//
+//        }
     }
 
     //把前端表单参数转化为键值对存到map中

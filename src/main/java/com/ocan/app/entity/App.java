@@ -11,7 +11,6 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
-import java.util.Set;
 
 @Data
 //当设置 autoResultMap 为 true 时，MyBatis Plus 会自动生成结果映射，
@@ -47,16 +46,5 @@ public class App {
     private String appCode;
     //应用所有者
     private String appOwner;
-
-//    //存放文件
-//    @TableField(exist = false)
-//    private Set<byte[]> fileSet;
-
-    /*
-    //存放图片
-    @TableField(exist = false)
-    private byte[] pictureSet;
-
-     */
 
 }

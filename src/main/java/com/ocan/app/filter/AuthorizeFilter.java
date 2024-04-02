@@ -22,19 +22,22 @@ public class AuthorizeFilter implements Filter {
 
     //需要拦截的路径
     public static String[] needTokenUrls = new String[]{
-//            "/meeting/**",
+            "/appserver/**",
     };
 
     /*
     不需要拦截的路径
-    获取验证码，登录，注册，查询，检查新版本，下载主文件，下载指定文件
+    获取验证码，登录，注册，查询，检查新版本，下载主文件，下载指定文件，获取图片
      */
     public static String[] noNeedTokenUrls = new String[]{
-            "/meeting/system/randomImage",
-            "/meeting/system/login",
-            "/meeting/system/register",
-            "/meeting/appVersion/list",
-            "/meeting/appUpdate/*"
+            "/appserver/system/randomImage",
+            "/appserver/system/login",
+            "/appserver/system/register",
+            "/appserver/appVersion/list",
+            "/appserver/appVersion/listAll",
+            "/appserver/appUpdate/*",
+            "/appserver/uploads/**",
+            "/appserver/picture/**",
     };
 
 
