@@ -253,27 +253,6 @@ public class AppUpdateController {
 
             return jsonFile;
         }
-//        if (tempFile.createNewFile()) {
-//            //拷贝文件
-//            FileCopyUtils.copy(file.getBytes(), tempFile);
-//            //设置文件的属性
-//            //设置文件的磁盘路径
-//            jsonFile.put("file", saveFileName);
-//            //设置文件名
-//            jsonFile.put("name", file.getOriginalFilename());
-//            //设置文件大小
-//            jsonFile.put("size", file.getSize());
-//            //设置文件的MD5值
-//            jsonFile.put("md5", md5);
-//            //设置文件的类型
-//            jsonFile.put("type", file.getContentType());
-//            //设置是否是主文件
-//            jsonFile.put("isMain", isMain);
-//
-//            return jsonFile;
-//        } else {
-//
-//        }
 
     }
 
@@ -302,14 +281,7 @@ public class AppUpdateController {
             return imageAccess + pictureName + fileSuffixName;
         }
 
-//        if (tempFile.createNewFile()) {
-//            //拷贝文件
-//            FileCopyUtils.copy(file.getBytes(), tempFile);
-//            //设置图片的访问路径
-//            return imageAccess + pictureName + fileSuffixName;
-//        } else {
-//
-//        }
+
     }
 
     //把前端表单参数转化为键值对存到map中
